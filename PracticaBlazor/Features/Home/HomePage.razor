@@ -1,0 +1,42 @@
+﻿@page "/"
+@inject HttpClient Http
+<PageTitle>Blazing Trails</PageTitle>
+<h3>Home page</h3>
+
+@if (_trails == null)
+{
+    <p>Cargando trails...</p>
+}
+else
+{
+    <ComponentTrailDetail Trail="_selectedTrail"/>
+    <h1></h1>
+    <div class="grid ">
+        @foreach (var Trail in _trails)
+        {
+           <ComponentTrailCard Trail="Trail" OnSelected="HandleSelectedTrail" />
+        }
+    </div>
+}
+
+@*para separa el codigo c# de una page lo que se debe hacer es crear otro archivo con el mismo nombre por ejemplo "HomePage.razor.cs" de esta manera se vinculara este archivo con nuestr page*@
+@code {
+    private IEnumerable<Trail>? _trails;
+    private Trail? _selectedTrail;
+    private void HandleSelectedTrail(Trail trail)
+    {
+        _selectedTrail=trail;
+        StateHasChanged();
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _trails = await Http.GetFromJsonAsync<IEnumerable<Trail>>("trails/trail-data.json");
+        }
+        catch (Exception ex)
+        {
+            
+        }
+    }
+}
